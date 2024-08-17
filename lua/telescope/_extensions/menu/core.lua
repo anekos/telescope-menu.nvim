@@ -20,12 +20,19 @@ local call_picker = function(opts)
     menu = config.data[opts.menu_name]
   end
 
+  local filtered_items = {}
+  for _, item in ipairs(menu.items) do
+    if item.condition == nil or item.condition(ctx) then
+      table.insert(filtered_items, item)
+    end
+  end
+
   -- values in 2nd arg will be overwritten by opts
   pickers
     .new(opts, {
       prompt_title = opts.menu_name,
       finder = finders.new_table {
-        results = menu.items or {},
+        results = filtered_items or {},
         entry_maker = function(entry)
           return make_entry.set_default_entry_mt({
             value = entry.value,
